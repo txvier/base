@@ -3,14 +3,13 @@ package http
 import (
 	"errors"
 	"fmt"
-	berr "github.com/txvier/base/errors"
-	"regexp"
-	"strconv"
-	// "github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/txvier/base/txerror"
 	"gopkg.in/go-playground/validator.v8"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -45,7 +44,7 @@ func HttpFuncWrap(f HttpApiFunc) gin.HandlerFunc {
 
 		//respon logic
 		if rsp.e != nil {
-			panic(berr.ErrTrace(rsp.e))
+			panic(txerror.ErrTrace(rsp.e))
 		} else if rsp.o != nil {
 			cxt.JSON(200, rsp.o)
 			// cxt.SecureJSON(200,rsp.o)
@@ -80,7 +79,7 @@ type FieldEvaluaterFunc func(reflect.Value, reflect.StructField, *gin.Context) e
 
 func structFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.Context) (err error) {
 	if sf.Type.Kind() != reflect.Struct {
-		return berr.ErrInternalServerf(`the "%s\t" tag support struct filed only. `, "struct")
+		return txerror.ErrInternalServerf(`the "%s\t" tag support struct filed only. `, "struct")
 	}
 	tv := sf.Tag.Get("struct")
 
@@ -92,7 +91,7 @@ func structFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.Conte
 	} else if tv == "json" {
 		o := reflect.New(sf.Type).Interface()
 		if err = cxt.BindJSON(o); err != nil {
-			return berr.ErrTrace(err)
+			return txerror.ErrTrace(err)
 		}
 		tfv := reflect.ValueOf(o).Elem()
 		v.FieldByName(sf.Name).Set(tfv)
@@ -102,7 +101,7 @@ func structFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.Conte
 
 func queryStructFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.Context) (err error) {
 	if sf.Type.Kind() == reflect.Struct {
-		return berr.ErrInternalServerf(`the "%s\t" tag don't support struct filed. `, "query")
+		return txerror.ErrInternalServerf(`the "%s\t" tag don't support struct filed. `, "query")
 	}
 	tv := sf.Tag.Get("query")
 
@@ -114,11 +113,11 @@ func queryStructFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.
 	kv := cxt.Query(key)
 
 	if err = validateField(sf, kv); err != nil {
-		return berr.ErrTrace(err)
+		return txerror.ErrTrace(err)
 	}
 	tfv, err := fieldSetVal(sf.Type.Kind(), kv)
 	if err != nil {
-		return berr.ErrTrace(err)
+		return txerror.ErrTrace(err)
 	}
 	v.FieldByName(sf.Name).Set(tfv)
 	return
@@ -126,7 +125,7 @@ func queryStructFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.
 
 func pathStructFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.Context) (err error) {
 	if sf.Type.Kind() == reflect.Struct {
-		return berr.ErrInternalServerf(`the "%s\t" tag don't support struct filed. `, "path")
+		return txerror.ErrInternalServerf(`the "%s\t" tag don't support struct filed. `, "path")
 	}
 	tv := sf.Tag.Get("path")
 
@@ -139,11 +138,11 @@ func pathStructFiledEvaluate(v reflect.Value, sf reflect.StructField, cxt *gin.C
 	kv := cxt.Param(key)
 
 	if err = validateField(sf, kv); err != nil {
-		return berr.ErrTrace(err)
+		return txerror.ErrTrace(err)
 	}
 	tfv, err := fieldSetVal(sf.Type.Kind(), kv)
 	if err != nil {
-		return berr.ErrTrace(err)
+		return txerror.ErrTrace(err)
 	}
 	v.FieldByName(sf.Name).Set(tfv)
 	return err
@@ -197,7 +196,7 @@ func fieldSetVal(tftk reflect.Kind, kv string) (reflect.Value, error) {
 		return reflect.ValueOf(kv), nil
 	}
 	return reflect.ValueOf(nil),
-		berr.ErrInternalServer(errors.New("don't support the type of filed:" + tftk.String()))
+		txerror.ErrInternalServer(errors.New("don't support the type of filed:" + tftk.String()))
 }
 
 func parseTagName(sf reflect.StructField, tagName string) (bool, string) {

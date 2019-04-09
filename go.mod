@@ -38,6 +38,7 @@ require (
 	github.com/juju/testing v0.0.0-20180920084828-472a3e8b2073 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/pelletier/go-toml v1.3.0
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ugorji/go/codec v0.0.0-20190320090025-2dc34c0b8780 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2

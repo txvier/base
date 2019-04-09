@@ -1,4 +1,4 @@
-package time
+package txtime
 
 import (
 	"time"

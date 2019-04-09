@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/txvier/base/txerror"
 	"math"
 )
 
@@ -32,7 +33,7 @@ type Pageable struct {
 func NewPageable(pageSize int64, pageNumber int64) (p Pageable, err error) {
 
 	if pageSize == 0 {
-		return p, err.ErrBadRequestf("Bad Request Args:[pageSize],the value is:[%d]", pageSize)
+		return p, txerror.ErrBadRequestf("Bad Request Args:[pageSize],the value is:[%d]", pageSize)
 	}
 
 	p = Pageable{

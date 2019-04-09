@@ -1,7 +1,7 @@
 package common
 
 import (
-	bt "github.com/txvier/base/time"
+	"github.com/txvier/base/txtime"
 	"time"
 )
 
@@ -26,9 +26,9 @@ func NilParseInt64(arg interface{}) (i int64) {
 	return arg.(int64)
 }
 
-func NilParseJSONTime(arg interface{}) (j bt.JSONTime) {
+func NilParseJSONTime(arg interface{}) (j txtime.JSONTime) {
 	if arg == nil {
 		return j
 	}
-	return bt.JSONTime(time.Unix(0, arg.(int64)))
+	return txtime.JSONTime(time.Unix(0, arg.(int64)))
 }

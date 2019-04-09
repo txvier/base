@@ -1,4 +1,4 @@
-package err
+package txerror
 
 import (
 	"github.com/juju/errors"

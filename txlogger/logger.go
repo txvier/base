@@ -1,9 +1,9 @@
-package logger
+package txlogger
 
 import (
-	"dpm/vars"
 	"fmt"
 	"github.com/op/go-logging"
+	"github.com/txvier/base/txconfig"
 	"os"
 )
 
@@ -12,8 +12,8 @@ const (
 )
 
 var (
-	filePath = vars.Cfg.Get("logger.file_path").(string)
-	Logger   = logging.MustGetLogger(vars.PROJECT_NAME)
+	filePath = txconfig.Cfg.Get("logger.file_path").(string)
+	Logger   = logging.MustGetLogger(txconfig.PROJECT_NAME)
 	format   = logging.MustStringFormatter(LOG_FORMAT)
 )
 

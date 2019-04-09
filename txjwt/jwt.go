@@ -1,11 +1,12 @@
-package jwt
+package txjwt
 
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/gin-gonic/gin"
-	"github.com/txvier/base/errors"
-	"github.com/txvier/base/logger"
+	"github.com/txvier/base/txconfig"
+	"github.com/txvier/base/txerror"
+	"github.com/txvier/base/txlogger"
 	"net/http"
 	"time"
 )
@@ -50,14 +51,14 @@ func CreateToken(user *UserToken) (string, error) {
 			// see http://tools.ietf.org/html/draft-ietf-oauth-json-web-token-20#section-4.1.4
 			ExpiresAt: now.Add(time.Hour * 24).Unix(), //for dev
 			// ExpiresAt: now.Add(time.Minute * 10).Unix(),
-			Issuer:   vars.PROJECT_NAME,
+			Issuer:   txconfig.PROJECT_NAME,
 			IssuedAt: issuedAt.Unix(),
 		},
 		"level1",
 		user,
 	}
 	// Creat token string
-	return t.SignedString([]byte(SecretMap[vars.PROJECT_NAME]))
+	return t.SignedString([]byte(SecretMap[txconfig.PROJECT_NAME]))
 }
 
 func ValidateTokenHandlerFunc() gin.HandlerFunc {
@@ -67,12 +68,12 @@ func ValidateTokenHandlerFunc() gin.HandlerFunc {
 			// Get token from request
 			token, err := request.ParseFromRequestWithClaims(cxt.Request, request.AuthorizationHeaderExtractor, &UserClaims{},
 				func(token *jwt.Token) (interface{}, error) {
-					return []byte(SecretMap[vars.PROJECT_NAME]), nil
+					return []byte(SecretMap[txconfig.PROJECT_NAME]), nil
 				})
-			logger.Logger.Info("token:", token)
+			txlogger.Logger.Info("token:", token)
 			// If the token is missing or invalid, return error
 			if err != nil {
-				error := err.ErrTraceCode(http.StatusUnauthorized, err)
+				error := txerror.ErrTraceCode(http.StatusUnauthorized, err)
 				panic(error)
 			}
 
@@ -81,7 +82,7 @@ func ValidateTokenHandlerFunc() gin.HandlerFunc {
 			u := token.Claims.(*UserClaims).UserToken
 			cxt.Set(CURRENT_USER, u)
 			// Got the value like this : context.Get(r,"cusr").(*UserToken)
-			logger.Logger.Infof("username is:[%s],and pwd is:[%s]", u.Name, "*********")
+			txlogger.Logger.Infof("username is:[%s],and pwd is:[%s]", u.Name, "*********")
 		}
 
 		cxt.Next()
