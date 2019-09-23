@@ -11,3 +11,10 @@ func TestInitLogger(t *testing.T) {
 	// output:
 	// hello logger
 }
+
+func TestDefaultLoggerLocation(t *testing.T) {
+	logger := GetLogger()
+	logger.Infoln("hello logger")
+	// output:
+	// hello logger
+}

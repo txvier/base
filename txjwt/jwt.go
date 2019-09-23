@@ -4,7 +4,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/gin-gonic/gin"
-	"github.com/txvier/base/txconfig"
 	"github.com/txvier/base/txerror"
 	"github.com/txvier/base/txlogger"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 )
 
 var (
+	logger    = txlogger.GetLogger()
 	SecretMap = map[string]string{
 		"PROJECT_NAME": "welcome to dmp",
 	}
@@ -34,9 +34,10 @@ type UserClaims struct {
 }
 
 type UserToken struct {
-	Id   string
-	Name string
-	Pwd  string
+	Id     string
+	Name   string
+	Pwd    string
+	Issuer string
 }
 
 func CreateToken(user *UserToken) (string, error) {
@@ -51,26 +52,26 @@ func CreateToken(user *UserToken) (string, error) {
 			// see http://tools.ietf.org/html/draft-ietf-oauth-json-web-token-20#section-4.1.4
 			ExpiresAt: now.Add(time.Hour * 24).Unix(), //for dev
 			// ExpiresAt: now.Add(time.Minute * 10).Unix(),
-			Issuer:   txconfig.PROJECT_NAME,
+			Issuer:   user.Issuer,
 			IssuedAt: issuedAt.Unix(),
 		},
 		"level1",
 		user,
 	}
 	// Creat token string
-	return t.SignedString([]byte(SecretMap[txconfig.PROJECT_NAME]))
+	return t.SignedString([]byte(SecretMap[user.Issuer]))
 }
 
-func ValidateTokenHandlerFunc() gin.HandlerFunc {
+func ValidateTokenHandlerFunc(issuer string) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
 		if !IgnoreValidateRoute[cxt.Request.URL.Path] && cxt.Request.Method != "OPTIONS" {
 			// only accessible with a valid token
 			// Get token from request
 			token, err := request.ParseFromRequestWithClaims(cxt.Request, request.AuthorizationHeaderExtractor, &UserClaims{},
 				func(token *jwt.Token) (interface{}, error) {
-					return []byte(SecretMap[txconfig.PROJECT_NAME]), nil
+					return []byte(SecretMap[issuer]), nil
 				})
-			txlogger.Logger.Info("token:", token)
+			logger.Info("token:", token)
 			// If the token is missing or invalid, return error
 			if err != nil {
 				error := txerror.ErrTraceCode(http.StatusUnauthorized, err)
@@ -82,7 +83,7 @@ func ValidateTokenHandlerFunc() gin.HandlerFunc {
 			u := token.Claims.(*UserClaims).UserToken
 			cxt.Set(CURRENT_USER, u)
 			// Got the value like this : context.Get(r,"cusr").(*UserToken)
-			txlogger.Logger.Infof("username is:[%s],and pwd is:[%s]", u.Name, "*********")
+			logger.Infof("username is:[%s],and pwd is:[%s]", u.Name, "*********")
 		}
 
 		cxt.Next()

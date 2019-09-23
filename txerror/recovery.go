@@ -8,6 +8,10 @@ import (
 	"runtime/debug"
 )
 
+var (
+	logger = txlogger.GetLogger()
+)
+
 func Recovery() gin.HandlerFunc {
 	return func(cxt *gin.Context) {
 		defer func() {
@@ -20,7 +24,7 @@ func Recovery() gin.HandlerFunc {
 						errMsg = errors.ErrorStack(ae.GetError())
 						httpCode = ae.HttpStatusCode
 					}
-					txlogger.Logger.Error(errMsg)
+					logger.Error(errMsg)
 					debug.PrintStack()
 					cxt.JSON(httpCode, map[string]string{
 						"rsp_msg": oe.Error(),

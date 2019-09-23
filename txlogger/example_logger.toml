@@ -2,7 +2,7 @@
 level = "debug"
 formatter.name = "json"
 
-#out.name = "stdout"
+out.name = "stdout"
 
 [[hooks]]
     name = "file"

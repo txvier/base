@@ -14,9 +14,14 @@ type TxLogger struct {
 	*logrus.Logger
 }
 
-var txlogger TxLogger
+const default_location = "example_logger.toml"
 
-func GetLogger() TxLogger {
+var txlogger *TxLogger
+
+func GetLogger() *TxLogger {
+	if txlogger == nil {
+		InitLogger(default_location)
+	}
 	return txlogger
 }
 
@@ -48,7 +53,7 @@ func InitLogger(lgLocation string, ops ...Option) (err error) {
 	if err = logrusHelper.SetConfig(logrus.StandardLogger(), c); err != nil { // for e.g. apply it to logrus default instance
 		return err
 	}
-	txlogger = TxLogger{lg}
+	txlogger = &TxLogger{lg}
 	return
 	// ### End Read Configuration
 }
