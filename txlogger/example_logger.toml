@@ -1,0 +1,16 @@
+
+level = "debug"
+formatter.name = "json"
+
+#out.name = "stdout"
+
+[[hooks]]
+    name = "file"
+    [hooks.options]
+        glob-pattern ="example.log.%Y%m%d%H%M"
+        link-name = "example.log"
+        max-age= "168h"
+        rotation-time = "1m"
+        clock=""
+        rotation-count=0
+        level= "info"

@@ -1,4 +1,4 @@
-package http
+package txhttp
 
 import (
 	"github.com/gin-contrib/cors"
@@ -17,7 +17,7 @@ type (
 )
 
 var (
-	httpRouters = make([]HttpRouter,0,0)
+	httpRouters = make([]HttpRouter, 0, 0)
 
 	middlewares = []gin.HandlerFunc{
 		gin.Logger(),
@@ -70,5 +70,3 @@ func (grg *GinRouterGroup) RegisterMiddleWare(r *gin.RouterGroup) {
 		r.Use(middleware)
 	}
 }
-
-
