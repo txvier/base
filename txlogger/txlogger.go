@@ -20,7 +20,9 @@ var txlogger *TxLogger
 
 func GetLogger() *TxLogger {
 	if txlogger == nil {
-		InitLogger(default_location)
+		txlogger = &TxLogger{
+			logrus.New(),
+		}
 	}
 	return txlogger
 }
