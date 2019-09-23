@@ -51,8 +51,8 @@ func InitLogger(lgLocation string, ops ...Option) (err error) {
 
 	// Read configuration
 	//mate.RegisterWriter("rotatelogs", NewRotatelogsWriter)
-	var c = logrusHelper.UnmarshalConfiguration(cfg.Viper)                    // Unmarshal configuration from Viper
-	if err = logrusHelper.SetConfig(logrus.StandardLogger(), c); err != nil { // for e.g. apply it to logrus default instance
+	var c = logrusHelper.UnmarshalConfiguration(cfg.Viper) // Unmarshal configuration from Viper
+	if err = logrusHelper.SetConfig(lg, c); err != nil {   // for e.g. apply it to logrus default instance
 		return err
 	}
 	txlogger = &TxLogger{lg}
