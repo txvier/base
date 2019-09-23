@@ -43,7 +43,9 @@ type GinEngin struct {
 }
 
 func NewGin() *GinEngin {
-	return &GinEngin{}
+	return &GinEngin{
+		gin.New(),
+	}
 }
 
 func (e *GinEngin) NewGroup(s string) *GinRouterGroup {
